@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(platform("io.opentelemetry:opentelemetry-bom:1.34.1"))
+    implementation("io.opentelemetry:opentelemetry-api")
+    implementation("io.opentelemetry:opentelemetry-sdk")
+    implementation("com.google.cloud:google-cloud-trace:2.30.0")
+    implementation("com.google.cloud.opentelemetry:exporter-trace:0.15.0")
+}
+
+test {
+    useJUnitPlatform()
+}
