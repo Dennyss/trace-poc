@@ -3,6 +3,7 @@ package org.example;
 import com.google.cloud.opentelemetry.trace.TraceConfiguration;
 import com.google.cloud.opentelemetry.trace.TraceExporter;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.common.CompletableResultCode;
@@ -23,8 +24,8 @@ public class Main {
         OpenTelemetrySdk openTelemetrySdk = setupTraceExporter();
 
         // Create spans, events and do the job
+        // Call getTracer() when we need it in the code ech time
         Span spanA = openTelemetrySdk.getTracer(INSTRUMENTATION_SCOPE_NAME).spanBuilder("Span A").startSpan();
-//        Span spanB = openTelemetrySdk.getTracer(INSTRUMENTATION_SCOPE_NAME).spanBuilder("Span B").startSpan();
         try (Scope scope = spanA.makeCurrent()) {
             spanA.addEvent("Event A");
             // Do some work here
@@ -42,6 +43,14 @@ public class Main {
             spanB.addEvent("Event A");
             // Do some work here
             delay(3);
+
+            // Nested spans demonstration
+            Span childSpan = openTelemetrySdk.getTracer(INSTRUMENTATION_SCOPE_NAME).spanBuilder("Child of span B")
+                    .setParent(Context.current().with(spanB))
+                    .startSpan();
+
+            delay(2);
+            childSpan.end();
 
             spanB.addEvent("Event B");
             // Do some work here
